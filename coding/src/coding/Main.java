@@ -51,6 +51,8 @@ class Main {
 	static String tripEndpoint = "https://api-v3.mbta.com/trips/";
 
 	static OffsetDateTime now;
+	private static int totalResults = 10;
+
 	public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 	public static void main(String[] args) throws JsonProcessingException, IOException, ParseException {
@@ -72,7 +74,7 @@ class Main {
 		if (trainDataNode.isArray()) {
 			int count = 0;
 			for (final JsonNode objNode : trainDataNode) {
-				if (count < 10) {
+				if (count < totalResults) {
 					try {
 						String routeId = objNode.get("relationships").get("route").get("data").get("id").asText();
 						OffsetDateTime departureTime = OffsetDateTime
@@ -126,14 +128,14 @@ class Main {
 	}
 
 	private static long getDepartingTime(OffsetDateTime departureTime) {
-		return (departureTime.toEpochSecond() - now.toEpochSecond())  / 60;
+		return (departureTime.toEpochSecond() - now.toEpochSecond()) / 60;
 	}
 
 	private static JsonNode makeRequest(String endPoint) {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(endPoint))
 				.method("GET", HttpRequest.BodyPublishers.noBody()).build();
 		HttpResponse<String> response = null;
-		//System.out.println(endPoint);
+		// System.out.println(endPoint);
 		try {
 			response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
